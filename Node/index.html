@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Analysis</title>
+</head>
+<body>
+    <h1>Resume Analysis API Test</h1>
+    <form id="analysisForm" enctype="multipart/form-data">
+        <label for="resume">Upload Resume (PDF):</label>
+        <input type="file" id="resume" name="resume" accept=".pdf" required>
+        <br><br>
+        
+        <label for="jobDescription">Job Description (optional):</label>
+        <textarea id="jobDescription" name="jobDescription" rows="4" cols="50"></textarea>
+        <br><br>
+
+        <label for="analysisOption">Select Analysis Type:</label>
+        <select id="analysisOption" name="analysisOption">
+            <option value="Quick Scan">Quick Scan</option>
+            <option value="Detailed Analysis">Detailed Analysis</option>
+            <option value="ATS Optimization">ATS Optimization</option>
+        </select>
+        <br><br>
+
+        <button type="submit">Analyze Resume</button>
+    </form>
+
+    <h2>Analysis Result:</h2>
+    <pre id="result"></pre>
+
+    <script>
+        document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData();
+            const resumeFile = document.getElementById('resume').files[0];
+            const jobDescription = document.getElementById('jobDescription').value;
+            const analysisOption = document.getElementById('analysisOption').value;
+
+            if (!resumeFile) {
+                alert('Please upload a PDF file.');
+                return;
+            }
+
+            formData.append('resume', resumeFile);
+            formData.append('jobDescription', jobDescription);
+            formData.append('analysisOption', analysisOption);
+
+            try {
+                const response = await fetch('http://localhost:3000/analyze', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('result').textContent = JSON.stringify(result, null, 2);
+                } else {
+                    document.getElementById('result').textContent = `Error: ${response.statusText}`;
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
